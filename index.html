@@ -3,128 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ULG Support Academy</title>
+    <title>ULG Support Academy | Future </title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
     <style>
         :root {
             --bg-base: #030705;
             --bg-surface: #0a120e;
-            --bg-card: rgba(10, 18, 14, 0.6);
+            --bg-card: rgba(10, 18, 14, 0.7);
             --primary: #00ff66;
-            --primary-dim: rgba(0, 255, 102, 0.1);
-            --primary-glow: rgba(0, 255, 102, 0.3);
-            --text-main: #ffffff;
+            --primary-dim: rgba(0, 255, 102, 0.12);
+            --primary-glow: rgba(0, 255, 102, 0.35);
+            --primary-glow-heavy: rgba(0, 255, 102, 0.75);
+            --text-main: #f8fafc;
             --text-secondary: #94a3b8;
-            --border-color: rgba(0, 255, 102, 0.15);
-            --glass-blur: blur(12px);
-            --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-color: rgba(0, 255, 102, 0.18);
+            --glass-blur: blur(16px);
+            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* 
-          تحديث الحماية: 
-          منع تحديد النصوص بالماوس في كامل الصفحة
-        */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Cairo', sans-serif;
-            user-select: none; /* منع التحديد */
+            user-select: none;
             -webkit-user-select: none;
         }
 
-        /* استثناءات التحديد (إن لزم الأمر في المستقبل لنماذج الإدخال) */
         input, textarea, .form-block {
             user-select: text;
             -webkit-user-select: text;
         }
 
+        html { scroll-behavior: smooth; }
+
         body {
             background-color: var(--bg-base);
             color: var(--text-main);
             overflow-x: hidden;
-            line-height: 1.6;
+            line-height: 1.7;
+            position: relative;
         }
 
         body.locked { overflow: hidden; height: 100vh; }
 
-        ::-webkit-scrollbar { width: 6px; }
+        .aurora-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.25;
+            animation: floatBlob 18s infinite alternate ease-in-out;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: var(--primary); }
+        .blob-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #00b348; animation-delay: -5s; }
+        .blob-3 { top: 40%; left: 40%; width: 400px; height: 400px; background: #004d1f; animation-delay: -10s; }
+
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 80px) scale(1.1); }
+            100% { transform: translate(-40px, -50px) scale(0.9); }
+        }
+
+        .cursor-glow {
+            position: fixed;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(0, 255, 102, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            transition: transform 0.1s ease-out;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-base); }
-        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 255, 102, 0.3); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        /* Cinematic Intro */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(10, 18, 14, 0.95);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 12px 28px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px var(--primary-glow);
+            backdrop-filter: var(--glass-blur);
+            font-weight: 700;
+            z-index: 10000;
+            transition: var(--transition-smooth);
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
         #intro {
             position: fixed;
             inset: 0;
             background: radial-gradient(circle at center, #071a10 0%, var(--bg-base) 100%);
             z-index: 9999;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: opacity 1.5s ease, visibility 1.5s;
+            transition: opacity 1.2s ease, visibility 1.2s;
         }
         #intro.hidden { opacity: 0; visibility: hidden; }
-        
+
+        .intro-logo-icon {
+            font-size: 4.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-shadow: 0 0 35px var(--primary-glow-heavy);
+            animation: pulseIntro 2.5s infinite ease-in-out;
+        }
+
         .intro-text {
-            font-size: clamp(2rem, 5vw, 4rem);
+            font-size: clamp(2.2rem, 5vw, 4rem);
             font-weight: 900;
             text-align: center;
             opacity: 0;
-            filter: blur(10px);
-            transform: scale(0.9);
-            animation: cinematicReveal 2s forwards 0.5s;
+            filter: blur(12px);
+            transform: scale(0.85);
+            animation: cinematicReveal 1.8s forwards 0.3s;
         }
-        .intro-text span {
-            color: var(--primary);
-            text-shadow: 0 0 30px var(--primary-glow);
-        }
+        .intro-text span { color: var(--primary); text-shadow: 0 0 30px var(--primary-glow-heavy); }
+
         .intro-hint {
             position: absolute;
-            bottom: 40px;
-            font-size: 1rem;
+            bottom: 50px;
+            font-size: 1.1rem;
             color: var(--text-secondary);
             opacity: 0;
-            animation: pulse 2s infinite alternate, fadeIn 1s forwards 2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: pulse 2s infinite alternate, fadeIn 1s forwards 1.8s;
         }
 
-        /* Header */
         header {
             position: fixed;
             top: 0;
             width: 100%;
-            background: rgba(3, 7, 5, 0.7);
+            background: rgba(3, 7, 5, 0.85);
             backdrop-filter: var(--glass-blur);
             border-bottom: 1px solid var(--border-color);
             z-index: 1000;
             transform: translateY(-100%);
-            transition: transform 1s var(--transition);
+            transition: transform 0.8s var(--transition-smooth);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
         body.active header { transform: translateY(0); }
 
         .nav-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 15px 30px;
+            padding: 14px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 900;
             color: var(--text-main);
             text-decoration: none;
             display: flex;
             align-items: center;
+            gap: 12px;
+        }
+        .logo-badge {
+            background: var(--primary-dim);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: rgba(255,255,255,0.03);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+            animation: pulse 1.5s infinite;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            background: rgba(10, 18, 14, 0.85);
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+        .nav-links button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px 22px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links button:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.05); }
+        .nav-links button.active {
+            background: var(--primary);
+            color: var(--bg-base);
+            box-shadow: 0 0 20px var(--primary-glow-heavy);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--primary);
+            font-size: 1.4rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 130px auto 60px;
+            padding: 0 30px;
+            min-height: 80vh;
+            position: relative;
+            z-index: 2;
+        }
+
+        .view-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+        .view-section.active { display: block; opacity: 1; transform: translateY(0); }
+
+        .section-title {
+            font-size: 2.3rem;
+            font-weight: 900;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .section-title i { color: var(--primary); text-shadow: 0 0 15px var(--primary-glow); }
+        .highlight { color: var(--primary); }
+
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 40px; }
+
+        .spotlight-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: var(--glass-blur);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        .spotlight-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0, 255, 102, 0.12), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .spotlight-card:hover::before { opacity: 1; }
+        .spotlight-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 25px var(--primary-dim);
+        }
+
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
             gap: 10px;
         }
-        .logo::before {
+
+        .video-wrapper {
+            width: 100%;
+            aspect-ratio: 21/9;
+            background: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 30px var(--primary-dim);
+            margin-bottom: 50px;
+            transition: var(--transition-smooth);
+        }
+        .video-wrapper:hover { border-color: var(--primary); }
+        .video-wrapper video { width: 100%; height: 100%; object-fit: cover; outline: none; }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(10, 18, 14, 0.85) 0%, rgba(3, 7, 5, 0.95) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(8px);
+        }
+        
+        .play-btn {
+            width: 90px;
+            height: 90px;
+            background: var(--primary-dim);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 0 30px var(--primary-glow);
+        }
+        .video-overlay:hover .play-btn { 
+            transform: scale(1.15) rotate(5deg); 
+            background: var(--primary); 
+            color: var(--bg-base);
+            box-shadow: 0 0 50px var(--primary-glow-heavy);
+        }
+
+        .timeline-container {
+            position: relative;
+            margin: 30px 0;
+            padding-right: 30px;
+            border-right: 2px solid var(--border-color);
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        .timeline-item::before {
             content: '';
+            position: absolute;
+            right: -37px;
+            top: 5px;
             width: 12px;
             height: 12px;
             background: var(--primary);
@@ -132,326 +403,281 @@
             box-shadow: 0 0 15px var(--primary);
         }
 
-        .nav-links {
-            display: flex;
-            gap: 5px;
-            background: var(--bg-surface);
-            padding: 5px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-        .nav-links button {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            padding: 10px 20px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: var(--transition);
+        .search-palette {
             position: relative;
-        }
-        .nav-links button:hover { color: var(--text-main); }
-        .nav-links button.active {
-            background: var(--primary-dim);
-            color: var(--primary);
-            box-shadow: inset 0 0 10px var(--primary-glow);
-        }
-
-        /* Main Content */
-        main {
-            max-width: 1400px;
-            margin: 120px auto 60px;
-            padding: 0 30px;
-            min-height: 80vh;
-        }
-
-        .view-section {
-            display: none;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: sectionReveal 0.6s var(--transition) forwards;
-        }
-        .view-section.active { display: block; }
-
-        /* Typography & Utilities */
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 900;
             margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
         }
-        .section-title::before {
-            content: '';
-            width: 40px;
-            height: 4px;
-            background: var(--primary);
-            border-radius: 4px;
-            box-shadow: 0 0 10px var(--primary);
-        }
-        .highlight { color: var(--primary); }
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        
-        /* Cards */
-        .glass-card {
-            background: var(--bg-card);
+        .search-palette input {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            background: rgba(10, 18, 14, 0.9);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 30px;
-            backdrop-filter: var(--glass-blur);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-        .glass-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5), 0 0 20px var(--primary-dim);
-        }
-        .card-title { font-size: 1.3rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
-        
-        /* 
-          تحديث مشغل الفيديو 
-          ليكون وظيفي بالكامل مع غطاء ذكي
-        */
-        .video-wrapper {
-            width: 100%;
-            aspect-ratio: 21/9;
-            background: #000;
-            border: 1px solid var(--primary-glow);
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            margin-bottom: 50px;
-        }
-        
-        .video-wrapper video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+            border-radius: 14px;
+            color: var(--text-main);
+            font-size: 1.1rem;
             outline: none;
-            background: #000;
-            z-index: 1;
+            transition: var(--transition-smooth);
+            backdrop-filter: var(--glass-blur);
         }
-
-        .video-overlay {
+        .search-palette input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 25px var(--primary-glow);
+        }
+        .search-palette i {
             position: absolute;
-            inset: 0;
-            background: linear-gradient(45deg, #020403, #0a120e);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        .video-overlay:hover { border-color: var(--primary); }
-
-        .play-btn {
-            width: 80px;
-            height: 80px;
-            background: var(--primary-dim);
-            border: 2px solid var(--primary);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2rem;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
             color: var(--primary);
-            margin-bottom: 20px;
-            transition: var(--transition);
-            box-shadow: 0 0 20px var(--primary-glow);
+            font-size: 1.2rem;
         }
-        .video-overlay:hover .play-btn { transform: scale(1.1); background: var(--primary); color: var(--bg-base); }
-        
-        /* Lists & Accordions */
-        .premium-list { list-style: none; }
-        .premium-list li {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            margin-bottom: 10px;
-            padding: 20px;
-            border-radius: 12px;
-            display: flex;
-            gap: 20px;
-            transition: var(--transition);
-        }
-        .premium-list li:hover { border-color: var(--primary); background: var(--bg-card); }
-        .list-num { font-size: 1.5rem; font-weight: 900; color: var(--primary); opacity: 0.5; }
-        
-        /* Commands Table */
-        .cmd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; }
+
+        .cmd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
         .cmd-item {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            padding: 15px 20px;
-            border-radius: 10px;
+            padding: 16px 20px;
+            border-radius: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
         }
-        .cmd-code { font-family: monospace; color: var(--primary); font-size: 1.1rem; background: var(--primary-dim); padding: 4px 8px; border-radius: 6px; }
+        .cmd-item:hover {
+            border-color: var(--primary);
+            background: var(--primary-dim);
+            transform: translateY(-3px);
+        }
+        .cmd-code { 
+            font-family: monospace; 
+            color: var(--primary); 
+            font-size: 1.05rem; 
+            background: rgba(0, 255, 102, 0.08); 
+            padding: 6px 12px; 
+            border-radius: 8px; 
+            border: 1px solid rgba(0, 255, 102, 0.2);
+            font-weight: bold;
+        }
 
-        /* Code Blocks for Forms */
         .form-block {
             background: #020403;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 22px;
             font-family: monospace;
             color: var(--text-secondary);
             white-space: pre-wrap;
             margin-bottom: 20px;
             position: relative;
+            cursor: pointer;
+            transition: var(--transition-smooth);
         }
-        .form-title { color: var(--primary); font-family: 'Cairo'; font-weight: 700; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;}
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 30px;
-            border-top: 1px solid var(--border-color);
-            background: var(--bg-surface);
-            color: var(--text-secondary);
-            font-weight: 700;
-            letter-spacing: 2px;
+        .form-block:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-dim);
+        }
+        .form-title { 
+            color: var(--primary); 
+            font-family: 'Cairo'; 
+            font-weight: 800; 
+            margin-bottom: 12px; 
+            border-bottom: 1px solid var(--border-color); 
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* 
-          تصميم الكتيب التعليمي بنظام الانيميشن مع السكرول
-        */
         .booklet-container {
             display: flex;
             gap: 40px;
             align-items: flex-start;
-            margin-top: 20px;
+            margin-top: 30px;
         }
         .booklet-image-col {
             flex: 1;
             position: sticky;
-            top: 120px; /* للثبات أثناء النزول */
-            border-radius: 16px;
+            top: 130px;
+            border-radius: 20px;
             border: 1px solid var(--border-color);
             background: var(--bg-surface);
-            box-shadow: 0 15px 30px rgba(0, 255, 102, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 255, 102, 0.15);
             overflow: hidden;
         }
-        .booklet-image-col img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
+        .booklet-image-col img { width: 100%; height: auto; display: block; object-fit: cover; }
+        .booklet-text-col { flex: 1.5; display: flex; flex-direction: column; gap: 28px; }
+
+        footer {
+            background: #020504;
+            border-top: 1px solid var(--border-color);
+            padding: 60px 0 30px;
+            margin-top: 80px;
+            position: relative;
+            z-index: 2;
         }
-        .booklet-text-col {
-            flex: 1.5;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
         }
-        .scroll-card {
-            background: var(--bg-card);
+        .footer-brand h2 { font-size: 1.8rem; color: var(--text-main); margin-bottom: 15px; font-weight: 900; }
+        .footer-brand p { color: var(--text-secondary); max-width: 400px; font-size: 0.95rem; margin-bottom: 20px; }
+        .footer-socials { display: flex; gap: 12px; }
+        .footer-socials a {
+            width: 42px;
+            height: 42px;
+            background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            padding: 30px;
-            border-radius: 16px;
-            backdrop-filter: var(--glass-blur);
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .scroll-card.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .scroll-card h3 {
             color: var(--primary);
-            font-size: 1.4rem;
-            margin-bottom: 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: var(--transition-smooth);
         }
-        .scroll-card p {
-            color: var(--text-secondary);
+        .footer-socials a:hover {
+            background: var(--primary);
+            color: var(--bg-base);
+            box-shadow: 0 0 20px var(--primary-glow-heavy);
+            transform: translateY(-4px);
+        }
+
+        .footer-links h4 {
+            color: var(--text-main);
             font-size: 1.1rem;
-            line-height: 1.8;
+            margin-bottom: 20px;
+            border-right: 3px solid var(--primary);
+            padding-right: 10px;
+        }
+        .footer-links ul { list-style: none; }
+        .footer-links li { margin-bottom: 10px; }
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            font-size: 0.95rem;
+        }
+        .footer-links a:hover { color: var(--primary); padding-right: 5px; }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 40px auto 0;
+            padding: 25px 30px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
         }
 
-        /* Animations */
-        @keyframes cinematicReveal {
-            to { opacity: 1; filter: blur(0); transform: scale(1); }
-        }
-        @keyframes pulse { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes cinematicReveal { to { opacity: 1; filter: blur(0); transform: scale(1); } }
+        @keyframes pulse { 0% { opacity: 0.4; } 100% { opacity: 1; } }
         @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes sectionReveal { to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseIntro { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            .nav-container { flex-direction: column; gap: 20px; }
-            .nav-links { width: 100%; overflow-x: auto; justify-content: flex-start; }
-            .nav-links button { white-space: nowrap; }
-            .section-title { font-size: 2rem; }
-            .premium-list li { flex-direction: column; gap: 10px; }
+        @media (max-width: 992px) {
+            .footer-container { grid-template-columns: 1fr; gap: 30px; }
             .booklet-container { flex-direction: column; }
             .booklet-image-col { position: relative; top: 0; width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-toggle { display: block; }
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                right: 30px;
+                left: 30px;
+                flex-direction: column;
+                background: rgba(10, 18, 14, 0.95);
+                backdrop-filter: var(--glass-blur);
+                border: 1px solid var(--border-color);
+                display: none;
+                padding: 15px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            }
+            .nav-links.show { display: flex; }
+            .server-status { display: none; }
+            .section-title { font-size: 1.8rem; }
+            .cmd-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body class="locked">
 
-    <!-- Cinematic Intro -->
-    <div id="intro">
-        <div class="intro-text">أهلاً بك أيها الإداري<br><span>أونر المستقبل</span></div>
-        <div class="intro-hint">انقر للبدء</div>
+    <div class="aurora-bg">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
     </div>
 
-    <!-- Audio -->
-    <audio id="bg-music" loop>
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <div id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toast-text">تم النسخ بنجاح!</span></div>
+
+    <div id="intro">
+        <i class="fa-solid fa-shield-halved intro-logo-icon"></i>
+        <div class="intro-text">أهلاً بك أيها الإداري<br><span>أونر المستقبل</span></div>
+        <div class="intro-hint"><i class="fa-solid fa-hand-pointer"></i> انقر للبدء</div>
+    </div>
+
+    <audio id="bg-music" loop preload="auto">
         <source src="Arctic Monkeys - I Wanna Be Yours (Instrumental).mp3" type="audio/wav">
     </audio>
 
-    <!-- Header -->
     <header>
         <div class="nav-container">
-            <a href="#" class="logo">ULG STAFF</a>
-            <div class="nav-links">
-                <button class="active" data-target="home">الرئيسية</button>
-                <button data-target="rules">القوانين والإرشادات</button>
-                <button data-target="commands">الأوامر والنماذج</button>
-                <button data-target="course">خاص بدورة التأهيل</button>
+            <a href="#" class="logo">
+                <i class="fa-solid fa-shield-cat highlight"></i>
+                ULG STAFF
+                <span class="logo-badge">v2.0</span>
+            </a>
+
+            <div class="server-status">
+                <span class="status-dot"></span>
+                <span>النظام الإداري النشط</span>
             </div>
+
+            <button class="mobile-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+
+            <nav class="nav-links" id="navMenu">
+                <button class="active" data-target="home"><i class="fa-solid fa-house"></i> الرئيسية</button>
+                <button data-target="rules"><i class="fa-solid fa-book-bookmark"></i> القوانين والإرشادات</button>
+                <button data-target="commands"><i class="fa-solid fa-terminal"></i> الأوامر والنماذج</button>
+                <button data-target="course"><i class="fa-solid fa-graduation-cap"></i> خاص بدورة التأهيل</button>
+            </nav>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main>
         
-        <!-- View: Home -->
         <section id="home" class="view-section active">
-<!-- Video Wrapper (المحدث) -->
-            <div class="video-wrapper" id="mainTutorialVideo">
-                <!-- تم وضع الرابط المباشر لجوجل درايف هنا -->
+            
+            <div class="video-wrapper" id="mainTutorialVideo" data-aos="fade-up">
                 <video id="tutorialVid" controls preload="metadata" crossorigin="anonymous">
                     <source src="https://files.catbox.moe/mr3apx.mp4" type="video/mp4">
- 
                 </video>
                 
-                <!-- الغطاء الذكي الذي يختفي عند النقر -->
                 <div class="video-overlay" id="vidOverlay">
-                    <div class="play-btn">▶</div>
-                    <h3 style="font-size: 1.5rem; z-index: 2;">تشغيل الفيديو التعليمي والشرح</h3>
-                    <p style="color: var(--text-secondary); z-index: 2;">اضغط هنا لمشاهدة الشرح التفصيلي لطاقم الدعم الفني</p>
+                    <div class="play-btn"><i class="fa-solid fa-play"></i></div>
+                    <h3 style="font-size: 1.6rem; z-index: 2;" class="highlight">تشغيل الفيديو التعليمي والشرح</h3>
+                    <p style="color: var(--text-secondary); z-index: 2; margin-top: 5px;">اضغط هنا لمشاهدة الشرح التفصيلي لطاقم الدعم الفني</p>
                 </div>
             </div>
 
-            <h1 class="section-title">نـظـام الـسـابـورتـات</h1>
-            <p style="margin-bottom: 30px; font-size: 1.1rem; color: var(--text-secondary);">نظام الرُتب داخل طاقم السابورتات قائم بشكل أساسي على عدد الريبورتات المُنجزة، وذلك لتسهيل فرز الأعضاء الجُدد من القدامى، وكذلك لتحديد المؤهلين للترقية إلى رتبة تريال أدمن.</p>
+            <h1 class="section-title" data-aos="fade-right"><i class="fa-solid fa-sitemap"></i> نـظـام الـسـابـورتـات</h1>
+            <p style="margin-bottom: 30px; font-size: 1.1rem; color: var(--text-secondary);" data-aos="fade-right" data-aos-delay="100">
+                نظام الرُتب داخل طاقم السابورتات قائم بشكل أساسي على عدد الريبورتات المُنجزة، وذلك لتسهيل فرز الأعضاء الجُدد من القدامى، وكذلك لتحديد المؤهلين للترقية إلى رتبة تريال أدمن.
+            </p>
 
             <div class="card-grid">
-                <div class="glass-card">
-                    <h3 class="card-title">تصنيف الرتب</h3>
+                <div class="spotlight-card" data-aos="fade-up" data-aos-delay="100">
+                    <h3 class="card-title"><i class="fa-solid fa-layer-group"></i> تصنيف الرتب</h3>
                     <ul style="list-style: none; line-height: 2.5;">
                         <li><span class="highlight">تيستر سبورت:</span> أقل من 500 ريبورت</li>
                         <li><span class="highlight">تريال سبورت:</span> من 500 إلى أقل من 1000</li>
@@ -460,79 +686,87 @@
                     </ul>
                 </div>
                 
-                <div class="glass-card">
-                    <h3 class="card-title">الـتـرقـيـة و الجوائز</h3>
+                <div class="spotlight-card" data-aos="fade-up" data-aos-delay="200">
+                    <h3 class="card-title"><i class="fa-solid fa-trophy"></i> الـتـرقـيـة و الجوائز</h3>
                     <p>يتم ترقية العضو عند استيفاء الشرط الأساسي: <strong>إتمام 1500 ريبورت</strong>.<br><br>بعدها يتم مراجعة التقييمات للتأكد من مطابقة الأداء. إذا كانت التقييمات إيجابية، تتم الترقية.</p>
-                    <div style="margin-top: 15px; padding: 10px; background: var(--primary-dim); border: 1px solid var(--primary); border-radius: 8px;">
-                        <strong class="highlight">جائزة التميز:</strong> عند وصولك لـ 1500 ريبورت مع تقييم 4.7 تحصل على جائزة 30$ من الموقع (من سبورت أساسي فما فوق).
+                    <div style="margin-top: 15px; padding: 12px; background: var(--primary-dim); border: 1px solid var(--primary); border-radius: 12px;">
+                        <strong class="highlight"><i class="fa-solid fa-gift"></i> جائزة التميز:</strong> عند وصولك لـ <span class="counter" data-target="1500">1500</span> ريبورت مع تقييم 4.7 تحصل على جائزة 30$ من الموقع (من سبورت أساسي فما فوق).
                     </div>
                 </div>
 
-                <div class="glass-card">
-                    <h3 class="card-title">الـعـقـوبـات وإسـتـرجـاع الـرتـبـة</h3>
+                <div class="spotlight-card" data-aos="fade-up" data-aos-delay="300">
+                    <h3 class="card-title"><i class="fa-solid fa-gavel"></i> الـعـقـوبـات وإسـتـرجـاع الـرتـبـة</h3>
                     <p>عند ارتكاب أي مخالفة، تُسحب رتبة السابورت بالكامل طبقًا للقوانين. <strong>لا يتم تخفيض الرتبة تدريجيًا</strong> بين تيستر/تريال/سبورت.<br><br>في حال تم استرجاع الرتبة لاحقًا، يُعاد احتساب العدد السابق للريبورتات كأساس 0.</p>
                 </div>
             </div>
         </section>
 
-        <!-- View: Rules -->
         <section id="rules" class="view-section">
-            <h1 class="section-title">دليل ومهام الدعم الفني</h1>
+            <h1 class="section-title" data-aos="fade-right"><i class="fa-solid fa-clipboard-list"></i> دليل ومهام الدعم الفني</h1>
             
-            <h3 class="card-title" style="margin-bottom: 20px;">خطوات استلام الوظيفة (إلزامي)</h3>
-            <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                <div class="glass-card"><span class="highlight" style="font-size: 2rem;">1</span><br>الذهاب لمركز الوظائف وأخذ وظيفة الرقابة الإدارية.</div>
-                <div class="glass-card"><span class="highlight" style="font-size: 2rem;">2</span><br>الذهاب لـ gmlounge وتسجيل الدخول.</div>
-                <div class="glass-card"><span class="highlight" style="font-size: 2rem;">3</span><br>تسجيل الدخول للوظيفة عبر E كمراقب مستوى 1.</div>
-                <div class="glass-card"><span class="highlight" style="font-size: 2rem;">4</span><br>تفعيل الشارة، لوحة الريبورتات، وأسماء اللاعبين من F10.</div>
-                <div class="glass-card"><span class="highlight" style="font-size: 2rem;">5</span><br>التوجه لقاعة اللاعبين الجدد عبر: <br><span class="highlight">/gotoplace newplayer</span></div>
-                <div class="glass-card"><span class="highlight" style="font-size: 2rem;">6</span><br>بدء قبول الريبورتات وانتظار اللاعبين لتعليمهم.</div>
+            <h3 class="card-title" style="margin-bottom: 20px;"><i class="fa-solid fa-list-check"></i> خطوات استلام الوظيفة (إلزامي)</h3>
+            <div class="timeline-container">
+                <div class="timeline-item spotlight-card" data-aos="fade-up">
+                    <span class="highlight" style="font-size: 1.2rem; font-weight: 800;">الخطوة 1</span>
+                    <p style="margin-top: 5px;">الذهاب لمركز الوظائف وأخذ وظيفة الرقابة الإدارية.</p>
+                </div>
+                <div class="timeline-item spotlight-card" data-aos="fade-up">
+                    <span class="highlight" style="font-size: 1.2rem; font-weight: 800;">الخطوة 2</span>
+                    <p style="margin-top: 5px;">الذهاب لـ <code>gmlounge</code> وتسجيل الدخول.</p>
+                </div>
+                <div class="timeline-item spotlight-card" data-aos="fade-up">
+                    <span class="highlight" style="font-size: 1.2rem; font-weight: 800;">الخطوة 3</span>
+                    <p style="margin-top: 5px;">تسجيل الدخول للوظيفة عبر <span class="highlight">E</span> كمراقب مستوى 1.</p>
+                </div>
+                <div class="timeline-item spotlight-card" data-aos="fade-up">
+                    <span class="highlight" style="font-size: 1.2rem; font-weight: 800;">الخطوة 4</span>
+                    <p style="margin-top: 5px;">تفعيل الشارة، لوحة الريبورتات، وأسماء اللاعبين من قائمة <span class="highlight">F10</span>.</p>
+                </div>
+                <div class="timeline-item spotlight-card" data-aos="fade-up">
+                    <span class="highlight" style="font-size: 1.2rem; font-weight: 800;">الخطوة 5</span>
+                    <p style="margin-top: 5px;">التوجه لقاعة اللاعبين الجدد عبر: <span class="highlight">/gotoplace newplayer</span></p>
+                </div>
+                <div class="timeline-item spotlight-card" data-aos="fade-up">
+                    <span class="highlight" style="font-size: 1.2rem; font-weight: 800;">الخطوة 6</span>
+                    <p style="margin-top: 5px;">بدء قبول الريبورتات وانتظار اللاعبين لتعليمهم.</p>
+                </div>
             </div>
 
-            <div class="glass-card" style="margin-bottom: 40px;">
-                <h3 class="card-title">الأنظمة الأساسية للمراقب</h3>
-                <ul class="premium-list">
-                    <li>
-                        <div class="list-num">01</div>
-                        <div>
-                            <strong style="color:var(--text-main); font-size:1.2rem;">نظام قبول الريبورتات</strong>
-                            <p>المهمة الأساسية لمراقب مستوى 1. قبول الريبورت عبر <code>/ar id</code>، التواصل بـ "ج"، وقفل الريبورت بـ <code>/cr</code> بعد الحل. عند الحاجة استخدم <code>/st</code> لطلب المساعدة. إهمال النظام يعرضك للعقوبة.</p>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="list-num">02</div>
-                        <div>
-                            <strong style="color:var(--text-main); font-size:1.2rem;">نظام تعليم اللاعبين</strong>
-                            <p>شرح قوانين الرول بلاي، قوانين المجتمع، وظائف البداية، والخريطة. يجب المنافسة على تعليم اللاعبين الجدد. الإهمال يؤدي للفصل.</p>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="list-num">03</div>
-                        <div>
-                            <strong style="color:var(--text-main); font-size:1.2rem;">نظام التقرير اليومي</strong>
-                            <p>يُرسل عبر تطبيق المدينة للسبورتات (إدارة الرقابة). التفاعل المطلوب: <strong>4 ساعات، 6 نقاط، 30 ريبورت، تعليم لاعب واحد</strong>. يمكن إرساله حتى الساعة 12 ليلاً.</p>
-                        </div>
-                    </li>
-                </ul>
+            <div class="spotlight-card" style="margin-bottom: 40px;" data-aos="fade-up">
+                <h3 class="card-title"><i class="fa-solid fa-sliders"></i> الأنظمة الأساسية للمراقب</h3>
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="background: var(--bg-surface); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color);">
+                        <strong style="color:var(--primary); font-size:1.2rem;">01. نظام قبول الريبورتات</strong>
+                        <p style="color:var(--text-secondary); margin-top:8px;">المهمة الأساسية لمراقب مستوى 1. قبول الريبورت عبر <code>/ar id</code>، التواصل بـ "ج"، وقفل الريبورت بـ <code>/cr</code> بعد الحل. عند الحاجة استخدم <code>/st</code> لطلب المساعدة. إهمال النظام يعرضك للعقوبة.</p>
+                    </div>
+                    <div style="background: var(--bg-surface); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color);">
+                        <strong style="color:var(--primary); font-size:1.2rem;">02. نظام تعليم اللاعبين</strong>
+                        <p style="color:var(--text-secondary); margin-top:8px;">شرح قوانين الرول بلاي، قوانين المجتمع، وظائف البداية، والخريطة. يجب المنافسة على تعليم اللاعبين الجدد. الإهمال يؤدي للفصل.</p>
+                    </div>
+                    <div style="background: var(--bg-surface); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color);">
+                        <strong style="color:var(--primary); font-size:1.2rem;">03. نظام التقرير اليومي</strong>
+                        <p style="color:var(--text-secondary); margin-top:8px;">يُرسل عبر تطبيق المدينة للسبورتات (إدارة الرقابة). التفاعل المطلوب: <strong>4 ساعات، 6 نقاط، 30 ريبورت، تعليم لاعب واحد</strong>. يمكن إرساله حتى الساعة 12 ليلاً.</p>
+                    </div>
+                </div>
             </div>
 
-            <h3 class="card-title" style="margin-bottom: 20px;">التعليمات والقوانين الصارمة (أهم التعليمات)</h3>
-            <ul class="premium-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 15px;">
-                <li><div>1. التواجد بقاعة <code>newplayer</code> إلزامي ويمنع الخروج بدون إذن.</div></li>
-                <li><div>2. يمنع قبول أكثر من ريبورت في نفس الوقت أو استخدام البايند.</div></li>
-                <li><div>3. الرد دائمًا داخل <code>/st</code> و <code>/g</code> حتى لو كنت مشغولاً.</div></li>
-                <li><div>4. يمنع الـ AFK أثناء الوظيفة أو استخدام الرتبة لغرض شخصي.</div></li>
-                <li><div>5. يمنع حمل الأسلحة، الممنوعات، أو أدوات العلاج/التصليح كرقابي.</div></li>
-                <li><div>6. لا يسمح بالمراقبة <code>/recon</code> بدون إذن فايس فما فوق.</div></li>
-                <li><div>7. تقييم أقل من 4.5 يؤدي لتجميد الترقية مؤقتاً.</div></li>
-                <li><div>8. يمنع قفل الريبورت قبل حل المشكلة بالكامل.</div></li>
-                <li><div>9. لعب RP مسموح فقط عند عدم وجود ريبورتات، ويجب التسجيل وقت الضغط.</div></li>
-                <li><div>10. يمنع تعديل اسم لاعب دون طلبه بواقعية من مركز الشرطة.</div></li>
-            </ul>
+            <h3 class="card-title" style="margin-bottom: 20px;"><i class="fa-solid fa-triangle-exclamation"></i> التعليمات والقوانين الصارمة (أهم التعليمات)</h3>
+            <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+                <div class="spotlight-card"><span class="highlight">1.</span> التواجد بقاعة <code>newplayer</code> إلزامي ويمنع الخروج بدون إذن.</div>
+                <div class="spotlight-card"><span class="highlight">2.</span> يمنع قبول أكثر من ريبورت في نفس الوقت أو استخدام البايند.</div>
+                <div class="spotlight-card"><span class="highlight">3.</span> الرد دائمًا داخل <code>/st</code> و <code>/g</code> حتى لو كنت مشغولاً.</div>
+                <div class="spotlight-card"><span class="highlight">4.</span> يمنع الـ AFK أثناء الوظيفة أو استخدام الرتبة لغرض شخصي.</div>
+                <div class="spotlight-card"><span class="highlight">5.</span> يمنع حمل الأسلحة، الممنوعات، أو أدوات العلاج/التصليح كرقابي.</div>
+                <div class="spotlight-card"><span class="highlight">6.</span> لا يسمح بالمراقبة <code>/recon</code> بدون إذن فايس فما فوق.</div>
+                <div class="spotlight-card"><span class="highlight">7.</span> تقييم أقل من 4.5 يؤدي لتجميد الترقية مؤقتاً.</div>
+                <div class="spotlight-card"><span class="highlight">8.</span> يمنع قفل الريبورت قبل حل المشكلة بالكامل.</div>
+                <div class="spotlight-card"><span class="highlight">9.</span> لعب RP مسموح فقط عند عدم وجود ريبورتات، ويجب التسجيل وقت الضغط.</div>
+                <div class="spotlight-card"><span class="highlight">10.</span> يمنع تعديل اسم لاعب دون طلبه بواقعية من مركز الشرطة.</div>
+            </div>
 
-            <div class="glass-card" style="margin-top: 40px;">
-                <h3 class="card-title">تنويهات التعامل مع اللاعبين</h3>
-                <p>
+            <div class="spotlight-card" style="margin-top: 40px;">
+                <h3 class="card-title"><i class="fa-solid fa-circle-info"></i> تنويهات التعامل مع اللاعبين</h3>
+                <p style="color: var(--text-secondary); line-height: 2;">
                     - <strong>نقل لاعب:</strong> فقط إذا كان في عالم آخر أو ساعاته أقل من 30. غير ذلك، دعه يتوجه لمستخرج مركبات.<br>
                     - <strong>الطلبات الممنوعة:</strong> (تصليح، بنزين، سلاح، أموال) ترفض ويُوجه اللاعب للمتاجر الواقعية.<br>
                     - <strong>معرفة مكان لاعب:</strong> يمنع نهائياً (منعاً للغش).<br>
@@ -543,42 +777,45 @@
             </div>
         </section>
 
-        <!-- View: Commands & Forms -->
         <section id="commands" class="view-section">
-            <h1 class="section-title">الأوامر الإدارية والنماذج</h1>
+            <h1 class="section-title" data-aos="fade-right"><i class="fa-solid fa-terminal"></i> الأوامر الإدارية والنماذج</h1>
             
-            <h3 class="card-title" style="margin-bottom: 20px;">قائمة الأوامر (1-22)</h3>
-            <p style="margin-bottom:20px; color:var(--text-secondary);">* الأوامر من خضراء اللون تتطلب إرسال دليل إلزامي في روم الأدلة خلال 15 دقيقة.</p>
+            <div class="search-palette">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="cmdSearchInput" placeholder="ابحث عن أمر إداري أو وصف... (VS Code Command Search)">
+            </div>
+
+            <p style="margin-bottom:20px; color:var(--text-secondary);">* الأوامر الملونة بالأخضر تتطلب إرسال دليل إلزامي في روم الأدلة خلال 15 دقيقة. انقر على أي أمر لنسخه.</p>
             
-            <div class="cmd-grid" style="margin-bottom: 50px;">
-                <div class="cmd-item"><span>قبول ريبورت</span> <span class="cmd-code">/ar</span></div>
-                <div class="cmd-item"><span>إقفال ريبورت</span> <span class="cmd-code">/cr</span></div>
-                <div class="cmd-item"><span>شات السبورت</span> <span class="cmd-code">/g</span></div>
-                <div class="cmd-item"><span>شات المساعدة</span> <span class="cmd-code">/st</span></div>
-                <div class="cmd-item"><span>مقر الرقابة</span> <span class="cmd-code">/gmlounge</span></div>
-                <div class="cmd-item"><span>التقييمات الإدارية</span> <span class="cmd-code">/showfeedbacks</span></div>
-                <div class="cmd-item"><span>قاعة السبورتات</span> <span class="cmd-code">/gotoplace newplayer</span></div>
-                <div class="cmd-item"><span>معلومات شخص</span> <span class="cmd-code">/check</span></div>
-                <div class="cmd-item"><span>معلومات شخصية</span> <span class="cmd-code">/findalts</span></div>
-                <div class="cmd-item"><span>معلومات السيارة</span> <span class="cmd-code">/checkveh</span></div>
-                <div class="cmd-item"><span class="highlight">تغيير اسم (<5 ساعات)</span> <span class="cmd-code">/changename</span></div>
-                <div class="cmd-item"><span class="highlight">مراقبة لاعب</span> <span class="cmd-code">/recon</span></div>
-                <div class="cmd-item"><span class="highlight">انتقال للاعب</span> <span class="cmd-code">/goto</span></div>
-                <div class="cmd-item"><span class="highlight">انتقال لسيارة</span> <span class="cmd-code">/gotoveh id</span></div>
-                <div class="cmd-item"><span class="highlight">سحب شخص</span> <span class="cmd-code">/gethere id</span></div>
-                <div class="cmd-item"><span class="highlight">سحب سيارة</span> <span class="cmd-code">/getveh id</span></div>
-                <div class="cmd-item"><span class="highlight">تصليح سيارة</span> <span class="cmd-code">/fixveh id</span></div>
-                <div class="cmd-item"><span class="highlight">انتقال لمكان</span> <span class="cmd-code">/gotoplace</span></div>
-                <div class="cmd-item"><span class="highlight">تعبئة دم</span> <span class="cmd-code">/aheal</span></div>
-                <div class="cmd-item"><span class="highlight">إلغاء قلب سيارة</span> <span class="cmd-code">/unflip</span></div>
-                <div class="cmd-item"><span>معرفة التواجد</span> <span class="cmd-code">/mypoints</span></div>
-                <div class="cmd-item"><span>حفظ التواجد</span> <span class="cmd-code">/savePoints</span></div>
+            <div class="cmd-grid" id="commandsContainer" style="margin-bottom: 50px;">
+                <div class="cmd-item" data-copy="/ar"><span>قبول ريبورت</span> <span class="cmd-code">/ar</span></div>
+                <div class="cmd-item" data-copy="/cr"><span>إقفال ريبورت</span> <span class="cmd-code">/cr</span></div>
+                <div class="cmd-item" data-copy="/g"><span>شات السبورت</span> <span class="cmd-code">/g</span></div>
+                <div class="cmd-item" data-copy="/st"><span>شات المساعدة</span> <span class="cmd-code">/st</span></div>
+                <div class="cmd-item" data-copy="/gmlounge"><span>مقر الرقابة</span> <span class="cmd-code">/gmlounge</span></div>
+                <div class="cmd-item" data-copy="/showfeedbacks"><span>التقييمات الإدارية</span> <span class="cmd-code">/showfeedbacks</span></div>
+                <div class="cmd-item" data-copy="/gotoplace newplayer"><span>قاعة السبورتات</span> <span class="cmd-code">/gotoplace newplayer</span></div>
+                <div class="cmd-item" data-copy="/check"><span>معلومات شخص</span> <span class="cmd-code">/check</span></div>
+                <div class="cmd-item" data-copy="/findalts"><span>معلومات شخصية</span> <span class="cmd-code">/findalts</span></div>
+                <div class="cmd-item" data-copy="/checkveh"><span>معلومات السيارة</span> <span class="cmd-code">/checkveh</span></div>
+                <div class="cmd-item" data-copy="/changename"><span class="highlight">تغيير اسم (&lt;5 ساعات)</span> <span class="cmd-code">/changename</span></div>
+                <div class="cmd-item" data-copy="/recon"><span class="highlight">مراقبة لاعب</span> <span class="cmd-code">/recon</span></div>
+                <div class="cmd-item" data-copy="/goto"><span class="highlight">انتقال للاعب</span> <span class="cmd-code">/goto</span></div>
+                <div class="cmd-item" data-copy="/gotoveh"><span class="highlight">انتقال لسيارة</span> <span class="cmd-code">/gotoveh id</span></div>
+                <div class="cmd-item" data-copy="/gethere"><span class="highlight">سحب شخص</span> <span class="cmd-code">/gethere id</span></div>
+                <div class="cmd-item" data-copy="/getveh"><span class="highlight">سحب سيارة</span> <span class="cmd-code">/getveh id</span></div>
+                <div class="cmd-item" data-copy="/fixveh"><span class="highlight">تصليح سيارة</span> <span class="cmd-code">/fixveh id</span></div>
+                <div class="cmd-item" data-copy="/gotoplace"><span class="highlight">انتقال لمكان</span> <span class="cmd-code">/gotoplace</span></div>
+                <div class="cmd-item" data-copy="/aheal"><span class="highlight">تعبئة دم</span> <span class="cmd-code">/aheal</span></div>
+                <div class="cmd-item" data-copy="/unflip"><span class="highlight">إلغاء قلب سيارة</span> <span class="cmd-code">/unflip</span></div>
+                <div class="cmd-item" data-copy="/mypoints"><span>معرفة التواجد</span> <span class="cmd-code">/mypoints</span></div>
+                <div class="cmd-item" data-copy="/savePoints"><span>حفظ التواجد</span> <span class="cmd-code">/savePoints</span></div>
             </div>
 
             <div class="card-grid">
-                <div class="glass-card">
-                    <h3 class="card-title">دليل رومات الديسكورد</h3>
-                    <ul style="list-style:none; line-height:2;">
+                <div class="spotlight-card">
+                    <h3 class="card-title"><i class="fa-brands fa-discord"></i> دليل رومات الديسكورد</h3>
+                    <ul style="list-style:none; line-height:2.2;">
                         <li><span class="highlight">دليل عمل الطاقم:</span> شرح مهام الطاقم.</li>
                         <li><span class="highlight">إشعارات الطاقم:</span> تنويهات المسؤولين.</li>
                         <li><span class="highlight">تعليمات لجنة الرقابة:</span> تعليمات موجهة للطاقم.</li>
@@ -590,11 +827,11 @@
                 </div>
             </div>
 
-            <h3 class="card-title" style="margin-top: 40px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">النماذج الرسمية للتقارير (تنسخ وتلصق)</h3>
+            <h3 class="card-title" style="margin-top: 40px;"><i class="fa-solid fa-copy"></i> النماذج الرسمية للتقارير (اضغط للنسخ)</h3>
             
             <div class="card-grid" style="margin-top: 20px;">
-                <div class="form-block">
-<div class="form-title">نموذج التقرير اليومي</div>تاريخ التقرير : 
+                <div class="form-block" data-copy="تاريخ التقرير : &#10;اسم حساب الرقابي : &#10;عدد تعليم اللاعبين : 0 ( السبب: ) &#10;عدد الريبورتات المقبولة : &#10;التفاعل اليومي : &#10;اجمالي الاموال المصروفة ( اليوم ) : &#10;&#10;@إدارة الرقابة">
+                    <div class="form-title"><span>نموذج التقرير اليومي</span> <i class="fa-regular fa-copy"></i></div>تاريخ التقرير : 
 اسم حساب الرقابي :
 عدد تعليم اللاعبين : 0 ( السبب: )
 عدد الريبورتات المقبولة :
@@ -604,8 +841,8 @@
 ثم منشن لـ @إدارة الرقابة
                 </div>
 
-                <div class="form-block">
-<div class="form-title">نموذج طلب تغيير الاسم</div>اسم حسابك:
+                <div class="form-block" data-copy="اسم حسابك: &#10;اسمك القديم: &#10;اسمك الجديد : &#10;(الأول عربي والثاني عربي - أو انجليزي كامل) &#10;&#10;تحول ل مسؤولين الدعم الفني : @منشن">
+                    <div class="form-title"><span>نموذج طلب تغيير الاسم</span> <i class="fa-regular fa-copy"></i></div>اسم حسابك:
 اسمك القديم: 
 اسمك الجديد :
 (الأول عربي والثاني عربي - أو انجليزي كامل)
@@ -613,23 +850,23 @@
 تحول ل مسؤولين الدعم الفني : @منشن
                 </div>
 
-                <div class="form-block">
-<div class="form-title">نموذج أدلة المهام (سحب/نقل)</div>ايدي اللاعب | ايدي السيارة : 
+                <div class="form-block" data-copy="ايدي اللاعب | ايدي السيارة : &#10;سبب السحب | النقل : &#10;صورة - دليل :">
+                    <div class="form-title"><span>نموذج أدلة المهام (سحب/نقل)</span> <i class="fa-regular fa-copy"></i></div>ايدي اللاعب | ايدي السيارة : 
 سبب السحب | النقل :
 صورة - دليل :
                 </div>
 
-                <div class="form-block">
-<div class="form-title">نموذج التظلم الصحيح</div>اسم حساب الاعب :
+                <div class="form-block" data-copy="اسم حساب الاعب : &#10;سبب التظلم : &#10;ايدي التظلم : &#10;صور تثبت كلامك ورقم التظلم : &#10;&#10;تحول ل مسؤولين الدعم الفني : @منشن">
+                    <div class="form-title"><span>نموذج التظلم الصحيح</span> <i class="fa-regular fa-copy"></i></div>اسم حساب الاعب :
 سبب التظلم : 
 ايدي التظلم : 
 صور تثبت كلامك ورقم التظلم :
 
 تحول ل مسؤولين الدعم الفني : @منشن
                 </div>
-                
-                <div class="form-block">
-<div class="form-title">نموذج طلب تعويض التدريب</div>اسم حسابك :
+
+                <div class="form-block" data-copy="اسم حسابك : &#10;اسم حساب الاعب : &#10;المبلغ المدفوع : &#10;عدد اجمالي تعليم الاعبين الخاص بك : &#10;&#10;تحول ل مسؤولين الدعم الفني : @منشن">
+                    <div class="form-title"><span>نموذج طلب تعويض التدريب</span> <i class="fa-regular fa-copy"></i></div>اسم حسابك :
 اسم حساب الاعب : 
 المبلغ المدفوع : 
 عدد اجمالي تعليم الاعبين الخاص بك :
@@ -639,25 +876,19 @@
             </div>
         </section>
 
-        <!-- View: Course (الكتيب التعليمي المحدث) -->
         <section id="course" class="view-section">
-            <h1 class="section-title">الكتيب التعليمي لدورة التأهيل</h1>
+            <h1 class="section-title" data-aos="fade-right"><i class="fa-solid fa-graduation-cap"></i> الكتيب التعليمي لدورة التأهيل</h1>
             <p style="color: var(--text-secondary); margin-bottom: 20px;">اقرأ الشرح المعروض بعناية لتعلم كافة المهام المطلوبة.</p>
             
             <div class="booklet-container">
-                
-                <!-- مكان الصورة الثابتة بجوار الشرح -->
                 <div class="booklet-image-col">
-                    <!-- غير هذا المسار "مسار_الصورة_هنا.jpg" ليتطابق مع مكان و اسم صورتك -->
                     <img src="ec2b77809d71a728.webp" alt="صورة الشرح التوضيحي">
                 </div>
 
-<!-- نصوص الكتيب التي تظهر بالأنيميشن أثناء الاسكرول -->
                 <div class="booklet-text-col">
-                    
-                    <div class="scroll-card">
-                        <h3>1. خطوات استلام وظيفة الدعم الفني</h3>
-                        <p>عند تسليمك الرتبة الخاصة بالدعم الفني، يجب عليك اتباع هذه الخطوات بالترتيب:</p>
+                    <div class="spotlight-card" data-aos="fade-up">
+                        <h3 class="card-title"><i class="fa-solid fa-list-ol"></i> 1. خطوات استلام وظيفة الدعم الفني</h3>
+                        <p style="color:var(--text-secondary);">عند تسليمك الرتبة الخاصة بالدعم الفني، يجب عليك اتباع هذه الخطوات بالترتيب:</p>
                         <ul style="list-style: decimal; margin-right: 25px; margin-top: 10px; line-height: 1.8; color: var(--text-secondary);">
                             <li>الذهاب أولاً إلى <strong>مركز الوظائف</strong> وأخذ وظيفة الرقابة الإدارية.</li>
                             <li>التوجه إلى <code>gmlounge</code> وتسجيل الدخول.</li>
@@ -668,9 +899,9 @@
                         </ul>
                     </div>
 
-                    <div class="scroll-card">
-                        <h3>2. نظام قبول الريبورتات</h3>
-                        <p>هذا النظام يعتبر من المهام الأساسية لمراقب مستوى 1. مبدأنا الأساسي هو مساعدة اللاعب وتوفير بيئة خالية من التخريب والمشاكل الفنية.</p>
+                    <div class="spotlight-card" data-aos="fade-up">
+                        <h3 class="card-title"><i class="fa-solid fa-headset"></i> 2. نظام قبول الريبورتات</h3>
+                        <p style="color:var(--text-secondary);">هذا النظام يعتبر من المهام الأساسية لمراقب مستوى 1. مبدأنا الأساسي هو مساعدة اللاعب وتوفير بيئة خالية من التخريب والمشاكل الفنية.</p>
                         <ul style="list-style: none; margin-top: 10px; line-height: 1.8; color: var(--text-secondary);">
                             <li>- <strong>القبول والتواصل:</strong> اقبل الريبورت بـ <code>/ar id</code> وتواصل معه بضغط زر <strong>"ج"</strong>.</li>
                             <li>- <strong>الإغلاق:</strong> بعد المساعدة، أغلق الريبورت بـ <code>/cr</code>.</li>
@@ -679,15 +910,15 @@
                         </ul>
                     </div>
 
-                    <div class="scroll-card">
-                        <h3>3. نظام تعليم اللاعبين</h3>
-                        <p>يبدأ بتعليم قوانين الرول بلاي العامة، ثم قوانين مجتمعنا الخاصة. بعد ذلك، تتجه لشرح نظام الوظائف (طريقة البداية، أول وظيفة، مواقعها) وتشرح له الخريطة بالكامل.</p>
+                    <div class="spotlight-card" data-aos="fade-up">
+                        <h3 class="card-title"><i class="fa-solid fa-user-graduate"></i> 3. نظام تعليم اللاعبين</h3>
+                        <p style="color:var(--text-secondary);">يبدأ بتعليم قوانين الرول بلاي العامة، ثم قوانين مجتمعنا الخاصة. بعد ذلك، تتجه لشرح نظام الوظائف (طريقة البداية، أول وظيفة، مواقعها) وتشرح له الخريطة بالكامل.</p>
                         <p style="margin-top: 10px; color: #ef4444;"><strong>تنبيه صارم:</strong> إهمالك لهذا النظام يؤدي إلى الفصل من الفريق لأنه من المهام الأساسية الدائمة.</p>
                     </div>
 
-                    <div class="scroll-card">
-                        <h3>4. نظام التقرير اليومي والأوامر</h3>
-                        <p>يُرسل التقرير عبر <strong>تطبيق المدينة > إدارة الرقابة والتفتيش > إرسال التقرير اليومي</strong>. (المدة المحددة مفتوحة حتى الساعة 12 ليلاً).</p>
+                    <div class="spotlight-card" data-aos="fade-up">
+                        <h3 class="card-title"><i class="fa-solid fa-chart-line"></i> 4. نظام التقرير اليومي والأوامر</h3>
+                        <p style="color:var(--text-secondary);">يُرسل التقرير عبر <strong>تطبيق المدينة &gt; إدارة الرقابة والتفتيش &gt; إرسال التقرير اليومي</strong>. (المدة المحددة مفتوحة حتى الساعة 12 ليلاً).</p>
                         <div style="background: var(--bg-surface); padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid var(--border-color);">
                             <strong style="color:var(--primary);">التفاعل اليومي المطلوب:</strong><br>
                             ⏳ 4 ساعات | 🔺 6 نقاط | 🧻 30 ريبورت | 🕴️ تعليم لاعب واحد
@@ -697,10 +928,10 @@
                             - لحفظ تفاعلك استخدم: <code style="color:var(--primary);">/savePoints</code>
                         </p>
                     </div>
-                    
-                    <div class="scroll-card">
-                        <h3>5. أدلة المهام الإدارية (السحب والنقل)</h3>
-                        <p>يُلزم إرسال دليل (صورة) عند سحب سيارة أو شخص في الروم المخصص بتطبيق المدينة خلال <span class="highlight">15 دقيقة فقط</span>.</p>
+
+                    <div class="spotlight-card" data-aos="fade-up">
+                        <h3 class="card-title"><i class="fa-solid fa-folder-open"></i> 5. أدلة المهام الإدارية (السحب والنقل)</h3>
+                        <p style="color:var(--text-secondary);">يُلزم إرسال دليل (صورة) عند سحب سيارة أو شخص في الروم المخصص بتطبيق المدينة خلال <span class="highlight">15 دقيقة فقط</span>.</p>
                         <div class="form-block" style="margin: 15px 0; padding: 15px;">
 ايدي اللاعب | ايدي السيارة : 
 سبب السحب | النقل : 
@@ -713,160 +944,167 @@
                         </ul>
                     </div>
 
-                    <div class="scroll-card" style="text-align: center; border-color: var(--primary);">
-                        <h3 style="margin-bottom: 5px;">دليل الدعم الفني</h3>
+                    <div class="spotlight-card" style="text-align: center; border-color: var(--primary);" data-aos="fade-up">
+                        <h3 style="margin-bottom: 5px;" class="highlight">دليل الدعم الفني</h3>
                         <p style="color: var(--text-secondary); font-size: 1.1rem;">نتمنى لكم التوفيق دائماً ❤️</p>
                         <p style="margin-top: 10px; font-weight: bold; color: var(--primary);">From : ULG High Staff</p>
                     </div>
-
-                </div>
-
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Footer -->
     <footer>
-        BY <span class="highlight">ULG DEV TEAM</span> .
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h2><i class="fa-solid fa-shield-cat highlight"></i> ULG SUPPORT</h2>
+                <p>البوابة الإدارية الرسمية المعتمدة لطاقم الدعم الفني والرقابة. تم تصميم وتطوير المنصة بأعلى معايير تجربة المستخدم.</p>
+                <div class="footer-socials">
+                    <a href="#"><i class="fa-brands fa-discord"></i></a>
+                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#"><i class="fa-solid fa-globe"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <h4>روابط سريعة</h4>
+                <ul>
+                    <li><a href="#" onclick="switchTab('home')">الرئيسية</a></li>
+                    <li><a href="#" onclick="switchTab('rules')">القوانين والإرشادات</a></li>
+                    <li><a href="#" onclick="switchTab('commands')">الأوامر والنماذج</a></li>
+                    <li><a href="#" onclick="switchTab('course')">دورة التأهيل</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>نظام الدعم</h4>
+                <ul>
+                    <li><a href="#">إدارة الرقابة والتفتيش</a></li>
+                    <li><a href="#">رفع التظلمات والتقارير</a></li>
+                    <li><a href="#">طلب الدعم الفني المباشر</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            BY <span class="highlight">ULG DEV TEAM</span> . جميع الحقوق محفوظة © 2026
+        </div>
     </footer>
 
-    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
-        // -----------------------------------------------------
-        // 1. نظام الحماية (منع الكليك يمين، النسخ، وفتح السورس كود)
-        // -----------------------------------------------------
-        document.addEventListener('contextmenu', event => event.preventDefault()); // الكليك يمين
-        document.addEventListener('copy', event => event.preventDefault()); // النسخ
+        AOS.init({ duration: 800, once: true, offset: 60 });
 
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('copy', e => e.preventDefault());
         document.addEventListener("keydown", function (e) {
-            // منع F12
-            if (e.key === "F12") {
-                e.preventDefault();
-            }
-            // منع Ctrl+Shift+I 
-            if (e.ctrlKey && e.shiftKey && e.key === "I") {
-                e.preventDefault();
-            }
-            // منع Ctrl+Shift+J 
-            if (e.ctrlKey && e.shiftKey && e.key === "J") {
-                e.preventDefault();
-            }
-            // منع Ctrl+Shift+C 
-            if (e.ctrlKey && e.shiftKey && e.key === "C") {
-                e.preventDefault();
-            }
-            // منع Ctrl+U (السورس كود)
-            if (e.ctrlKey && e.key === "u" || e.ctrlKey && e.key === "U") {
+            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) || (e.ctrlKey && (e.key === "u" || e.key === "U"))) {
                 e.preventDefault();
             }
         });
 
-        // -----------------------------------------------------
-        // 2. التحكم الشامل بالصفحة والصوت والفيديو
-        // -----------------------------------------------------
-        document.addEventListener('DOMContentLoaded', () => {
-            const intro = document.getElementById('intro');
-            const audio = document.getElementById('bg-music');
-            const navBtns = document.querySelectorAll('.nav-links button');
-            const sections = document.querySelectorAll('.view-section');
-            let isStarted = false;
-
-            // Start Experience
-            const startExperience = () => {
-                if (isStarted) return;
-                isStarted = true;
-                
-                // Play audio
-                audio.volume = 0.5;
-                audio.play().catch(e => console.log("Audio autoplay prevented"));
-                
-                // Hide Intro & Unlock Body
-                intro.classList.add('hidden');
-                document.body.classList.remove('locked');
-                document.body.classList.add('active');
-            };
-
-            intro.addEventListener('click', startExperience);
-            document.addEventListener('keydown', startExperience);
-
-            // Tab Navigation
-            navBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // Update active button
-                    navBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-
-                    // Switch Sections
-                    const target = btn.getAttribute('data-target');
-                    sections.forEach(sec => {
-                        sec.classList.remove('active');
-                        // Re-trigger animation
-                        sec.style.animation = 'none';
-                        sec.offsetHeight; // trigger reflow
-                        sec.style.animation = null;
-                        
-                        if (sec.id === target) {
-                            sec.classList.add('active');
-                        }
-                    });
-                    
-                    // Smooth scroll to top
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-            });
-
-            // -----------------------------------------------------
-            // 3. نظام الفيديو و الذكاء الصوتي
-            // -----------------------------------------------------
-            const videoElement = document.getElementById('tutorialVid');
-            const videoOverlay = document.getElementById('vidOverlay');
-
-            // عند الضغط على الغطاء، يختفي ويعمل الفيديو
-            videoOverlay.addEventListener('click', () => {
-                videoOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    videoOverlay.style.display = 'none';
-                    videoElement.play();
-                }, 400);
-            });
-
-            // عندما يعمل الفيديو -> تقف الموسيقى تلقائياً
-            videoElement.addEventListener('play', () => {
-                audio.pause();
-            });
-
-            // عندما يوقف الفيديو -> تعود الموسيقى
-            videoElement.addEventListener('pause', () => {
-                audio.play();
-            });
-
-            // عندما ينتهي الفيديو -> تعود الموسيقى ويرجع الغطاء
-            videoElement.addEventListener('ended', () => {
-                audio.play();
-                videoOverlay.style.display = 'flex';
-                setTimeout(() => {
-                    videoOverlay.style.opacity = '1';
-                }, 50);
-            });
-
-            // -----------------------------------------------------
-            // 4. أنيميشن الكتيب التعليمي (عند الاسكرول)
-            // -----------------------------------------------------
-            const scrollObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if(entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.15 }); // يعمل التأثير بمجرد ظهور 15% من البطاقة
-            
-            document.querySelectorAll('.scroll-card').forEach(card => {
-                scrollObserver.observe(card);
-            });
-
+        const cursorGlow = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove', (e) => {
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
         });
+
+        document.querySelectorAll('.spotlight-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        const navBtns = document.querySelectorAll('.nav-links button');
+        const sections = document.querySelectorAll('.view-section');
+
+        function switchTab(targetId) {
+            navBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-target') === targetId));
+            sections.forEach(sec => {
+                sec.classList.remove('active');
+                if (sec.id === targetId) sec.classList.add('active');
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => { AOS.refresh(); }, 100);
+        }
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchTab(btn.getAttribute('data-target'));
+                document.getElementById('navMenu').classList.remove('show');
+            });
+        });
+
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('navMenu').classList.toggle('show');
+        });
+
+        const intro = document.getElementById('intro');
+        const audio = document.getElementById('bg-music');
+        let isStarted = false;
+
+        intro.addEventListener('click', () => {
+            if (isStarted) return;
+            isStarted = true;
+            audio.volume = 0.4;
+            audio.play().catch(() => {});
+            intro.classList.add('hidden');
+            document.body.classList.remove('locked');
+            document.body.classList.add('active');
+        });
+
+        const videoElement = document.getElementById('tutorialVid');
+        const videoOverlay = document.getElementById('vidOverlay');
+
+        videoOverlay.addEventListener('click', () => {
+            videoOverlay.style.opacity = '0';
+            setTimeout(() => {
+                videoOverlay.style.display = 'none';
+                videoElement.play();
+            }, 400);
+        });
+
+        videoElement.addEventListener('play', () => audio.pause());
+        videoElement.addEventListener('pause', () => audio.play());
+        videoElement.addEventListener('ended', () => {
+            audio.play();
+            videoOverlay.style.display = 'flex';
+            setTimeout(() => { videoOverlay.style.opacity = '1'; }, 50);
+        });
+
+        const toast = document.getElementById('toast');
+        const toastText = document.getElementById('toast-text');
+
+        function showToast(text) {
+            toastText.textContent = text;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 2500);
+        }
+
+        document.querySelectorAll('[data-copy]').forEach(element => {
+            element.addEventListener('click', () => {
+                const textToCopy = element.getAttribute('data-copy');
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showToast('تم النسخ إلى الحافظة بنجاح!');
+                });
+            });
+        });
+
+        const cmdSearchInput = document.getElementById('cmdSearchInput');
+        if(cmdSearchInput) {
+            cmdSearchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                document.querySelectorAll('#commandsContainer .cmd-item').forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(query) ? 'flex' : 'none';
+                });
+            });
+        }
     </script>
 </body>
 </html>
